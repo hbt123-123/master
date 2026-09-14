@@ -4,3 +4,5 @@ node_modules/
 
 # Keep this file tracked
 !.gitignore
+
+!.env
