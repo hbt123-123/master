@@ -96,6 +96,10 @@ function resolveFourTransformations(ec, scope = "year") {
   return result;
 }
 
+function escapeXml(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
 function ziweiChart(name, birthday, birth_time, school = "sanhe", transform_scope = "year", timezone_offset = 8, longitude = 120.0) {
   const solarDt = parseBirthDatetime(birthday, birth_time);
   const trueDt = trueSolarDatetime(solarDt, timezone_offset, longitude);
@@ -185,8 +189,8 @@ function ziweiChart(name, birthday, birth_time, school = "sanhe", transform_scop
     const y = 20 + row * (boxH + 10);
     svgParts.push(`<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" fill="#131c2d" stroke="#32507a" />`);
     
-    const starsText = palaceStars[palace].map(s => s.name).join("、") || "无主星";
-    svgParts.push(`<text x="${x+8}" y="${y+22}" fill="#89b4ff" font-size="14">${palace}</text>`);
+    const starsText = palaceStars[palace].map(s => escapeXml(s.name)).join("、") || "无主星";
+    svgParts.push(`<text x="${x+8}" y="${y+22}" fill="#89b4ff" font-size="14">${escapeXml(palace)}</text>`);
     svgParts.push(`<text x="${x+8}" y="${y+48}" fill="#d7e5ff" font-size="13">${starsText}</text>`);
   });
   

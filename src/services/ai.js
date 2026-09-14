@@ -173,14 +173,14 @@ function buildAiPrompt(moduleName, userInput, result, referenceDate) {
 async function callOpenAiProtocol(systemPrompt, userPrompt, cfg) {
   const apiKey = cfg.api_key_openai;
   if (!apiKey) {
-    console.warn("openai protocol call failed: no api key");
+    console.warn("openai protocol call failed: no api key configured");
     return null;
   }
 
   const url = `${cfg.base_url_openai.replace(/\/$/, '')}/chat/completions`;
   const timeoutMs = cfg.timeout_sec * 1000;
 
-  console.log(`[AI] Calling OpenAI protocol: url=${url}, model=${cfg.model_openai}, timeout=${timeoutMs}ms`);
+  console.log(`[AI] Calling OpenAI protocol: model=${cfg.model_openai}, timeout=${timeoutMs}ms`);
 
   const payload = {
     model: cfg.model_openai,
@@ -209,7 +209,7 @@ async function callOpenAiProtocol(systemPrompt, userPrompt, cfg) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.warn(`[AI] OpenAI protocol failed: status=${response.status}, body=${errorText.substring(0, 500)}`);
+      console.warn(`[AI] OpenAI protocol failed: status=${response.status}`);
       return null;
     }
 
@@ -221,13 +221,13 @@ async function callOpenAiProtocol(systemPrompt, userPrompt, cfg) {
     if (err.name === 'AbortError') {
       console.warn(`[AI] OpenAI protocol timeout after ${timeoutMs}ms`);
     } else {
-      console.warn(`[AI] openai protocol call failed: message=${err.message}`);
+      console.warn(`[AI] openai protocol call failed`);
     }
     return null;
   }
 }
 
-async function* callOpenAiProtocolStream(systemPrompt, userPrompt, cfg) {
+async function callOpenAiProtocolStream(systemPrompt, userPrompt, cfg) {
   const apiKey = cfg.api_key_openai;
   if (!apiKey) return;
 
@@ -279,7 +279,7 @@ async function* callOpenAiProtocolStream(systemPrompt, userPrompt, cfg) {
       }
     }
   } catch (err) {
-    console.warn("openai protocol stream call failed:", err.message);
+    console.warn("openai protocol stream call failed");
   }
 }
 
@@ -333,7 +333,7 @@ async function* callAnthropicProtocolStream(systemPrompt, userPrompt, cfg) {
       }
     }
   } catch (err) {
-    console.warn("anthropic protocol stream call failed:", err.message);
+    console.warn("anthropic protocol stream call failed");
   }
 }
 
@@ -391,7 +391,7 @@ async function callAnthropicProtocol(systemPrompt, userPrompt, cfg) {
     const textParts = contentArr.filter(c => c.type === 'text').map(c => c.text);
     return textParts.join('\n').trim() || null;
   } catch (err) {
-    console.warn("anthropic protocol call failed:", err.message);
+    console.warn("anthropic protocol call failed");
     return null;
   }
 }
@@ -420,8 +420,8 @@ function normalizeAiAnalysisLines(lines) {
   return normalized;
 }
 
-const SENSITIVE_KEYWORDS = ["api_key", "apikey", "secret", "token"];
 function sanitizeResponsePayload(data) {
+  const SENSITIVE_KEYWORDS = ["api_key", "apikey", "secret", "token", "password", "authorization"];
   if (Array.isArray(data)) {
     return data.map(item => sanitizeResponsePayload(item));
   } else if (data !== null && typeof data === 'object') {
@@ -473,6 +473,11 @@ async function attachAiLayer(moduleName, userInput, result, referenceDate = null
   const cfg = aiSettings();
   const activeModel = cfg.protocol === "anthropic" ? cfg.model_anthropic : cfg.model_openai;
   const llmEnabledPublic = ["1", "true", "yes", "on"].includes((process.env.LLM_ENABLED || "true").toLowerCase());
+  const llmResponseMode = llmText ? "external" : "fallback";
+
+  if (llmResponseMode === "fallback") {
+    console.warn(`[AI] Using fallback response for module=${moduleName}`);
+  }
 
   merged.ai = {
     prompt_version: "v2.2",
@@ -482,7 +487,7 @@ async function attachAiLayer(moduleName, userInput, result, referenceDate = null
     deep_thinking_enabled: cfg.deep_thinking === "true",
     reasoning_effort: cfg.reasoning_effort,
     llm_enabled: llmEnabledPublic,
-    llm_response_mode: llmText ? "external" : "fallback",
+    llm_response_mode: llmResponseMode,
     time_context: timeCtx,
     knowledge_points: knowledge,
     optimized_prompt: prompt,

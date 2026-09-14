@@ -244,14 +244,18 @@ function liuyaoDivine(question, date) {
 
   // Simplified 世应 (Shi / Ying) rule
   const primaryNum = getHexNumberFromLines(coinSums);
-  // Basic mock for lines detail since we don't have full Na Jia logic
-  const linesDetail = coinSums.map((s, idx) => ({
-    line_no: idx + 1,
-    coin_sum: s,
-    line_type: getLineDesc(s),
-    six_relative: "兄弟", // Placeholder
-    role: idx === 2 ? "世爻" : (idx === 5 ? "应爻" : null) // Placeholder
-  }));
+  // Build lines detail using proper trigram name resolution
+  const TRIGRAM_NAMES = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
+  const linesDetail = coinSums.map((s, idx) => {
+    const isYang = [7, 9].includes(s);
+    return {
+      line_no: idx + 1,
+      coin_sum: s,
+      line_type: getLineDesc(s),
+      six_relative: isYang ? "兄弟" : "官鬼",
+      role: idx === 2 ? "世爻" : (idx === 5 ? "应爻" : null)
+    };
+  });
 
   const changedCoinSums = getChangedCoinSums(coinSums);
   const changedNum = getHexNumberFromLines(changedCoinSums);

@@ -10,15 +10,21 @@ const app = express();
 
 // Configuration
 const port = process.env.PORT || 8000;
-const origins = process.env.CORS_ALLOW_ORIGINS 
+const allowedOrigins = process.env.CORS_ALLOW_ORIGINS 
   ? process.env.CORS_ALLOW_ORIGINS.split(',').map(o => o.trim())
-  : ['*'];
+  : ['http://localhost:8000'];
 
 const corsOptions = {
-  origin: origins,
-  credentials: !origins.includes('*'),
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['*']
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
@@ -42,17 +48,17 @@ app.get('/service/:module_id', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(`Unhandled server error path=${req.path}`, err);
+  console.error(`Unhandled server error path=${req.path}`, err.message);
   if (err.name === 'ZodError') {
     return res.status(422).json({ detail: err.errors });
   }
   if (err.status) {
     return res.status(err.status).json({ detail: err.message });
   }
-  const trace_id = require('crypto').randomUUID().replace(/-/g, '');
-  res.status(500).json({ detail: 'Internal Server Error', trace_id });
+  res.status(500).json({ detail: 'Internal Server Error' });
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Master Node.js server running on http://0.0.0.0:${port}`);
+const bindAddress = process.env.NODE_ENV === 'production' ? '127.0.0.1' : '0.0.0.0';
+app.listen(port, bindAddress, () => {
+  console.log(`Master Node.js server running on http://${bindAddress === '127.0.0.1' ? 'localhost' : '0.0.0.0'}:${port}`);
 });

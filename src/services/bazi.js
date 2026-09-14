@@ -4,7 +4,10 @@ const {
   computeBaziStrength, pickStrength, getRng, GAN_WUXING, ZHI_WUXING
 } = require('../utils/helpers');
 
-function baziAnalysis(name, birthday, birth_time, gender, timezone_offset = 8, longitude = 120.0) {
+function baziAnalysis(name, birthday, birth_time, gender, timezone_offset = 8, longitude = null) {
+  if (longitude === null) {
+    longitude = 120.0;
+  }
   console.log(`bazi_analysis start name=${name} birthday=${birthday}`);
   const rawDt = parseBirthDatetime(birthday, birth_time);
   const trueDt = trueSolarDatetime(rawDt, timezone_offset, longitude);

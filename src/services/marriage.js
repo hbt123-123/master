@@ -4,7 +4,7 @@ const {
   ZHI_WUXING, getRng
 } = require('../utils/helpers');
 
-const REL_SCORE_CONFIG = {
+const REL_SCORE_CONFIG = Object.freeze({
   "default": {
     "weights": {
       "complementarity": 30,
@@ -32,9 +32,9 @@ const REL_SCORE_CONFIG = {
       "children_tong": 4,
       "dayun_element_match": 2,
     },
-    "clamp": { "min": 40, "max": 99 },
+    "clamp": { min: 40, max: 99 },
   }
-};
+});
 
 function compatibility(left, right, scene) {
   const scoreCfg = REL_SCORE_CONFIG[scene] || REL_SCORE_CONFIG["default"];
@@ -59,8 +59,8 @@ function compatibility(left, right, scene) {
     
     const { scores, strength, yong_shen, ji_shen } = computeBaziStrength(ec);
     
-    const genderCode = p.gender === "男" ? 1 : 0;
-    const daYuns = ec.getYun(genderCode).getDaYun();
+  const genderCode = p.gender === "男" ? 1 : p.gender === "女" ? 0 : 2;
+  const daYuns = ec.getYun(genderCode).getDaYun();
     
     return {
       ec, scores, strength, yong_shen, ji_shen, daYuns,

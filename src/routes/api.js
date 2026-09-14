@@ -25,6 +25,9 @@ function loadCities() {
 
 router.get('/api/cities/search', (req, res) => {
   const q = (req.query.q || '').trim().toLowerCase();
+  if (!q || q.length < 1) {
+    return res.json([]);
+  }
   const cities = loadCities();
   if (!q) {
     return res.json(cities.slice(0, 30));

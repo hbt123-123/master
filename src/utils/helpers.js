@@ -54,12 +54,12 @@ function getRng(...parts) {
   const seed = seedFromText(key);
   const prng = pseudoRandom(seed);
   return {
-    randint: (min, max) => Math.floor(prng() * (max - min + 1)) + min,
-    choice: (arr) => arr[Math.floor(prng() * arr.length)],
+    randint: (min, max) => crypto.randomInt(min, max + 1),
+    choice: (arr) => arr[crypto.randomInt(0, arr.length)],
     sample: (arr, k) => {
       const res = [...arr];
       for (let i = res.length - 1; i > 0; i--) {
-        const j = Math.floor(prng() * (i + 1));
+        const j = crypto.randomInt(0, i + 1);
         [res[i], res[j]] = [res[j], res[i]];
       }
       return res.slice(0, k);

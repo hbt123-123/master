@@ -393,9 +393,9 @@ function renderForm() {
   
   if (selected.id === "marriage") {
     copyBtn.style.display = "inline-block";
-  } else {
-    copyBtn.style.display = "inline-block"; // Now we allow copy on all modules
-  }
+    } else {
+      copyBtn.style.display = state.selected.id === "marriage" ? "inline-block" : "none";
+    }
 
   selected.fields.forEach(field => {
     if (field.type === "section") {
@@ -590,7 +590,9 @@ function escapeHtml(text) {
   return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function inlineMarkdownToHtml(text) {
@@ -603,7 +605,6 @@ function inlineMarkdownToHtml(text) {
 }
 
 function markdownToReadableHtml(markdown) {
-  // Simple markdown to HTML converter for paragraphs, lists, bold, and tables
   const lines = String(markdown || "").split(/\r?\n/);
   const html = [];
   let inList = false;
@@ -633,28 +634,25 @@ function markdownToReadableHtml(markdown) {
       continue;
     }
 
-    // Headers
     if (/^#{1,6}\s+/.test(line)) {
       closeList();
       closeTable();
-      html.push(`<p><strong>${inlineMarkdownToHtml(line.replace(/^#{1,6}\s+/, ""))}</strong></p>`);
+      html.push(`<p><strong>${escapeHtml(line.replace(/^#{1,6}\s+/, ""))}</strong></p>`);
       continue;
     }
 
-    // Tables
     if (line.startsWith("|") && line.endsWith("|")) {
       closeList();
-      
-      // Lookahead to see if next line is a separator to handle headers properly
+
       const isHeaderRow = !inTable && (i + 1 < lines.length && lines[i + 1].trim().startsWith("|") && lines[i + 1].trim().includes("---"));
-      
+
       if (!inTable) {
         html.push("<table>");
         inTable = true;
         if (isHeaderRow) {
           const headers = line.split("|").filter(Boolean).map(c => c.trim());
           html.push("<thead><tr>");
-          headers.forEach(h => html.push(`<th>${inlineMarkdownToHtml(h)}</th>`));
+          headers.forEach(h => html.push(`<th>${escapeHtml(h)}</th>`));
           html.push("</tr></thead><tbody>");
           i++; // Skip separator line
           continue;
@@ -662,31 +660,29 @@ function markdownToReadableHtml(markdown) {
           html.push("<tbody>");
         }
       }
-      
+
       const cells = line.split("|").filter(Boolean).map(c => c.trim());
       html.push("<tr>");
-      cells.forEach(c => html.push(`<td>${inlineMarkdownToHtml(c)}</td>`));
+      cells.forEach(c => html.push(`<td>${escapeHtml(c)}</td>`));
       html.push("</tr>");
       continue;
     }
 
-    // Lists
     if (/^[-*+]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
       closeTable();
       if (!inList) {
         html.push("<ul>");
         inList = true;
       }
-      html.push(`<li>${inlineMarkdownToHtml(line.replace(/^([-*+]|\d+\.)\s+/, ""))}</li>`);
+      html.push(`<li>${escapeHtml(line.replace(/^([-*+]|\d+\.)\s+/, ""))}</li>`);
       continue;
     }
 
-    // Paragraphs
     closeList();
     closeTable();
-    html.push(`<p>${inlineMarkdownToHtml(line)}</p>`);
+    html.push(`<p>${escapeHtml(line)}</p>`);
   }
-  
+
   closeList();
   closeTable();
   return html.join("");
