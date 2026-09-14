@@ -1,0 +1,8 @@
+◇ injected env (10) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+Master Node.js server running on http://0.0.0.0:8000
+bazi_analysis start name=赖小林 birthday=2006-12-29
+[AI] Calling OpenAI protocol: url=https://api.deepseek.com/chat/completions, model=deepseek-v4-flash, timeout=5000ms
+[AI] OpenAI protocol success, content length: 3238
+[AI] Calling OpenAI protocol: url=https://api.deepseek.com/chat/completions, model=deepseek-v4-flash, timeout=5000ms
+[AI] OpenAI protocol success, content length: 2173
+^C
