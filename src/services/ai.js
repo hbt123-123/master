@@ -227,7 +227,7 @@ async function callOpenAiProtocol(systemPrompt, userPrompt, cfg) {
   }
 }
 
-async function callOpenAiProtocolStream(systemPrompt, userPrompt, cfg) {
+async function* callOpenAiProtocolStream(systemPrompt, userPrompt, cfg) {
   const apiKey = cfg.api_key_openai;
   if (!apiKey) return;
 

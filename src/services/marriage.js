@@ -59,8 +59,15 @@ function compatibility(left, right, scene) {
     
     const { scores, strength, yong_shen, ji_shen } = computeBaziStrength(ec);
     
-  const genderCode = p.gender === "男" ? 1 : p.gender === "女" ? 0 : 2;
-  const daYuns = ec.getYun(genderCode).getDaYun();
+    let genderCode;
+    if (p.gender === "男") {
+      genderCode = 1;
+    } else if (p.gender === "女") {
+      genderCode = 0;
+    } else {
+      genderCode = 2;
+    }
+    const daYuns = ec.getYun(genderCode).getDaYun();
     
     return {
       ec, scores, strength, yong_shen, ji_shen, daYuns,

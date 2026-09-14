@@ -244,8 +244,6 @@ function liuyaoDivine(question, date) {
 
   // Simplified 世应 (Shi / Ying) rule
   const primaryNum = getHexNumberFromLines(coinSums);
-  // Build lines detail using proper trigram name resolution
-  const TRIGRAM_NAMES = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
   const linesDetail = coinSums.map((s, idx) => {
     const isYang = [7, 9].includes(s);
     return {
