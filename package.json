@@ -1,0 +1,28 @@
+{
+  "name": "master",
+  "version": "1.0.0",
+  "description": "Master - AI 智能东方智慧解析系统",
+  "main": "server.js",
+  "scripts": {
+    "test": "node test_all.js",
+    "build": "echo 'No build step required'",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "axios": "^1.15.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.1",
+    "express-async-errors": "^3.1.1",
+    "lunar-javascript": "^1.7.7",
+    "serverless-http": "^3.2.0",
+    "zod": "^4.3.6"
+  }
+}

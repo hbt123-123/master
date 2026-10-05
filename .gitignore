@@ -1,0 +1,9 @@
+.omo/
+.codegraph/
+node_modules/
+.env
+.env.*
+
+# Keep this file tracked
+!.gitignore
+!.env.example
